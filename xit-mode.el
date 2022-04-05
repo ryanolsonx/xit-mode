@@ -41,18 +41,19 @@
 (defvar xit-mode-font-lock-keywords
   (list
    '("^[a-zA-Z]+.*$" 0 'xit-group-title)
-   '("^\\(\\[ \\]\\) \\(.*\\)"
+   '("^\\(\\[ \\]\\) [\\!|\\.]*\\(.*\\)"
      (1 'xit-open-checkbox)
      (2 'xit-open-description))
-   '("^\\(\\[x\\]\\) \\(.*\\)"
+   '("^\\(\\[x\\]\\) [\\!|\\.]*\\(.*\\)"
      (1 'xit-checked-checkbox)
      (2 'xit-checked-description))
-   '("^\\(\\[@\\]\\) \\(.*\\)"
+   '("^\\(\\[@\\]\\) [\\!|\\.]*\\(.*\\)"
      (1 'xit-ongoing-checkbox)
      (2 'xit-ongoing-description))
    '("^\\(\\[~\\]\\) \\(.*\\)"
      (1 'xit-obsolete-checkbox)
-     (2 'xit-obsolete-description)))
+     (2 'xit-obsolete-description))
+   '("^\\[[x|@| |~]\\] \\([\\!|\\.]+\\)[^\\!|\\.]" 1 'xit-priority))
   "Highlighting specification for `xit-mode'.")
 
 (defface xit-group-title
@@ -98,6 +99,11 @@
 (defface xit-obsolete-description
   '((t :foreground "#838383"))
   "Face used for obsolete checkbox description."
+  :group 'xit-faces)
+
+(defface xit-priority
+  '((t :inherit error))
+  "Face used for priority markers ! or ."
   :group 'xit-faces)
 
 (defun xit-mode ()
