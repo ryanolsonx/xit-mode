@@ -65,7 +65,7 @@
   :group 'xit-faces)
 
 (defface xit-checked-checkbox
-  '((t :inherit font-lock-type-face))
+  '((t :inherit success))
   "Face used for checked checkbox."
   :group 'xit-faces)
 
