@@ -40,6 +40,7 @@
 ;  '("^#.*$" 0 'bold)
 (defvar xit-mode-font-lock-keywords
   (list
+   '("^[a-zA-Z]+.*$" 0 'xit-group-title)
    '("^\\(\\[ \\]\\) \\(.*\\)"
      (1 'xit-open-checkbox)
      (2 'xit-open-description))
@@ -53,6 +54,11 @@
      (1 'xit-obsolete-checkbox)
      (2 'xit-obsolete-description)))
   "Highlighting specification for `xit-mode'.")
+
+(defface xit-group-title
+  '((t :inherit (bold underline)))
+  "Face used for checkboxes group title"
+  :group 'xit-faces)
   
 (defface xit-open-checkbox
   '((t :inherit font-lock-function-name-face))
