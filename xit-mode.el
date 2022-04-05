@@ -37,16 +37,26 @@
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.xit\\'" . xit-mode))
 
+;  '("^#.*$" 0 'bold)
 (defvar xit-mode-font-lock-keywords
   (list
+   '("^\\(\\[ \\]\\) \\(.*\\)"
+     (1 'xit-open-checkbox)
+     (2 'xit-open-description))
    '("^\\(\\[x\\]\\) \\(.*\\)"
      (1 'xit-checked-checkbox)
-     (2 'xit-checked-description))
-   '("^#.*$" 0 'bold) ; make the line beginning with "#" bold
-   '("\\(foo\\)\\(bar\\)" ; the word foobar in two faces
-     (1 'font-lock-warning-face)
-     (2 'font-lock-type-face)))
+     (2 'xit-checked-description)))
   "Highlighting specification for `xit-mode'.")
+  
+(defface xit-open-checkbox
+  '((t :inherit font-lock-function-name-face))
+  "Face used for open checkbox."
+  :group 'xit-faces)
+
+(defface xit-open-description
+  '((t :inherit default))
+  "Face used for open checkbox description."
+  :group 'xit-faces)
 
 (defface xit-checked-checkbox
   '((t :inherit font-lock-type-face))
