@@ -45,7 +45,10 @@
      (2 'xit-open-description))
    '("^\\(\\[x\\]\\) \\(.*\\)"
      (1 'xit-checked-checkbox)
-     (2 'xit-checked-description)))
+     (2 'xit-checked-description))
+   '("^\\(\\[@\\]\\) \\(.*\\)"
+     (1 'xit-ongoing-checkbox)
+     (2 'xit-ongoing-description)))
   "Highlighting specification for `xit-mode'.")
   
 (defface xit-open-checkbox
@@ -64,8 +67,18 @@
   :group 'xit-faces)
 
 (defface xit-checked-description
-  '((t :inherit font-lock-type-face))
+  '((t :foreground "#737373"))
   "Face used for checked checkbox description."
+  :group 'xit-faces)
+
+(defface xit-ongoing-checkbox
+  '((t :inherit font-lock-keyword-face))
+  "Face used for ongoing checkbox."
+  :group 'xit-faces)
+
+(defface xit-ongoing-description
+  '((t :inherit default))
+  "Face used for ongoing checkbox description."
   :group 'xit-faces)
 
 (defun xit-mode ()
