@@ -28,32 +28,34 @@
 
 (defvar xit-mode-hook nil)
 
-(defvar xit-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\C-j" 'newline-and-indent)
-    map)
-  "Keymap for `xit-mode'.")
+;; (defvar xit-mode-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (define-key map "\C-j" 'newline-and-indent)
+;;     map)
+;;   "Keymap for `xit-mode'.")
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.xit\\'" . xit-mode))
 
-;  '("^#.*$" 0 'bold)
+;; descriptions disabled until tags in descriptions are resolved.
+;; right now tags don't display if a description has a face.
 (defvar xit-mode-font-lock-keywords
   (list
    '("^[a-zA-Z]+.*$" 0 'xit-group-title)
    '("^\\(\\[ \\]\\) [\\!|\\.]*\\(.*\\)"
-     (1 'xit-open-checkbox)
-     (2 'xit-open-description))
-   '("^\\(\\[x\\]\\) [\\!|\\.]*\\(.*\\)"
-     (1 'xit-checked-checkbox)
-     (2 'xit-checked-description))
+     (1 'xit-open-checkbox))
+     ;(2 'xit-open-description))
+   '("^\\(\\[x\\]\\) \\(.*\\)"
+     (1 'xit-checked-checkbox))
+     ;(2 'xit-checked-description))
    '("^\\(\\[@\\]\\) [\\!|\\.]*\\(.*\\)"
-     (1 'xit-ongoing-checkbox)
-     (2 'xit-ongoing-description))
+     (1 'xit-ongoing-checkbox))
+     ;(2 'xit-ongoing-description))
    '("^\\(\\[~\\]\\) \\(.*\\)"
      (1 'xit-obsolete-checkbox)
      (2 'xit-obsolete-description))
-   '("^\\[[x|@| |~]\\] \\([\\!|\\.]+\\)[^\\!|\\.]" 1 'xit-priority))
+   '("^\\[[x|@| |~]\\] \\([\\!|\\.]+\\)[^\\!|\\.]" 1 'xit-priority)
+   '("#[a-zA-Z0-9\\-_]+" 0 'xit-tag))
   "Highlighting specification for `xit-mode'.")
 
 (defface xit-group-title
@@ -106,11 +108,16 @@
   "Face used for priority markers ! or ."
   :group 'xit-faces)
 
+(defface xit-tag
+  '((t :inherit font-lock-constant-face))
+  "Face used for tags."
+  :group 'xit-faces)
+
 (defun xit-mode ()
   "Major mode for [x]it!"
   (interactive)
   (kill-all-local-variables)
-  (use-local-map xit-mode-map)
+  ;;(use-local-map xit-mode-map)
   (setq font-lock-defaults '(xit-mode-font-lock-keywords))
   (setq major-mode 'xit-mode)
   (setq mode-name "[x]it!")
