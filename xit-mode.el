@@ -62,7 +62,7 @@
   '((t :inherit (bold underline)))
   "Face used for checkboxes group title"
   :group 'xit-faces)
-  
+
 (defface xit-open-checkbox
   '((t :inherit font-lock-function-name-face))
   "Face used for open checkbox."
@@ -79,7 +79,7 @@
   :group 'xit-faces)
 
 (defface xit-checked-description
-  '((t :foreground "#838383"))
+  '((t :inherit font-lock-comment-face))
   "Face used for checked checkbox description."
   :group 'xit-faces)
 
@@ -94,12 +94,12 @@
   :group 'xit-faces)
 
 (defface xit-obsolete-checkbox
-  '((t :foreground "#838383"))
+  '((t :inherit font-lock-comment-delimiter-face))
   "Face used for obsolete checkbox."
   :group 'xit-faces)
 
 (defface xit-obsolete-description
-  '((t :foreground "#838383"))
+  '((t :inherit font-lock-comment-face))
   "Face used for obsolete checkbox description."
   :group 'xit-faces)
 
