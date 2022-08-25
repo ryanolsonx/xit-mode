@@ -26,6 +26,10 @@ In your .emacs or init.el:
 
 ## Key bindings
 
+### Creation
+
+In order to quickly create a new item, use `C-c C-n`. It simply adds a new open item and let you type the desired text.
+
 ### Status
 
 When placing the cursor on a line containing an item, some keybindings can help to change its status:
@@ -35,9 +39,9 @@ When placing the cursor on a line containing an item, some keybindings can help 
 - `C-c C-p`: set the item as in progress (`[@]`)
 - `C-c C-a`: set the item as archived, a.k.a obsolete (`[~]`)
 
-Additionally, there is a keybinding that cycle through these statuses:
+Additionally, there is a keybinding that cycle through these status:
 
-- `C-c C-c`: cycle through the different statuses (`open` -> `done` -> `in progress` -> `archived`)
+- `C-c C-c`: cycle through the different status (`open` -> `in progress` -> `done` -> `archived`)
 
 ### Priority
 

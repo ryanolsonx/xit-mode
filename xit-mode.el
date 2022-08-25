@@ -34,17 +34,25 @@
 (defvar xit--priority-regexp "\\([\\!|\\.]+ \\)"
   "The regpexp used to search for the priority.")
 
-(defvar xit--checkbox-string-open "[ ] "
+(defvar xit--checkbox-open-string "[ ] "
   "The open checkbox string.")
 
-(defvar xit--checkbox-string-checked "[x] "
+(defvar xit--checkbox-checked-string "[x] "
   "The checked checkbox string.")
 
-(defvar xit--checkbox-string-ongoing "[@] "
+(defvar xit--checkbox-ongoing-string "[@] "
   "The progress checkbox string.")
 
-(defvar xit--checkbox-string-obsolete "[~] "
+(defvar xit--checkbox-obsolete-string "[~] "
   "The obsolete checkbox string.")
+
+(defun xit-new-item ()
+  "Create a new xit item."
+  (interactive)
+  (beginning-of-line)
+  (insert "[ ] \n")
+  (forward-line -1)
+  (end-of-line))
 
 (defun xit--item-replace-checkbox (reg rep)
   "Replace the current item checkbox spotted by REG with REP."
@@ -57,22 +65,22 @@
 (defun xit-item-open ()
   "Set a xit item to open."
   (interactive)
-  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-string-open))
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-open-string))
 
 (defun xit-item-checked ()
   "Set a xit item to checked."
   (interactive)
-  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-string-checked))
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-checked-string))
 
 (defun xit-item-ongoing ()
   "Set a xit item to ongoing."
   (interactive)
-  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-string-ongoing))
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-ongoing-string))
 
 (defun xit-item-obsolete ()
   "Set a xit item to obsolete."
   (interactive)
-  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-string-obsolete))
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-obsolete-string))
 
 (defun xit-item-cycle ()
   "Cycle through xitem states."
@@ -83,14 +91,14 @@
     (when (re-search-forward xit--checkbox-regexp nil t)
       (let ((checkbox (match-string-no-properties 0)))
         (cond
-         ((string-equal checkbox xit--checkbox-string-open)
-          (replace-match xit--checkbox-string-ongoing))
-         ((string-equal checkbox xit--checkbox-string-ongoing)
-          (replace-match xit--checkbox-string-checked))
-         ((string-equal checkbox xit--checkbox-string-checked)
-          (replace-match xit--checkbox-string-obsolete))
-         ((string-equal checkbox xit--checkbox-string-obsolete)
-          (replace-match xit--checkbox-string-open))
+         ((string-equal checkbox xit--checkbox-open-string)
+          (replace-match xit--checkbox-ongoing-string))
+         ((string-equal checkbox xit--checkbox-ongoing-string)
+          (replace-match xit--checkbox-checked-string))
+         ((string-equal checkbox xit--checkbox-checked-string)
+          (replace-match xit--checkbox-obsolete-string))
+         ((string-equal checkbox xit--checkbox-obsolete-string)
+          (replace-match xit--checkbox-open-string))
          (t (warn "Checkbox not found")))))))
 
 (defun xit-item-inc-priority ()
@@ -118,6 +126,7 @@
 
 (defvar xit-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-n") 'xit-new-item)      ;; n for new
     (define-key map (kbd "C-c C-o") 'xit-item-open)     ;; o for open
     (define-key map (kbd "C-c C-d") 'xit-item-checked)  ;; d for done
     (define-key map (kbd "C-c C-p") 'xit-item-ongoing)  ;; p for progress
