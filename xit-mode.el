@@ -28,14 +28,114 @@
 
 (defvar xit-mode-hook nil)
 
-;; (defvar xit-mode-map
-;;   (let ((map (make-sparse-keymap)))
-;;     (define-key map "\C-j" 'newline-and-indent)
-;;     map)
-;;   "Keymap for `xit-mode'.")
+(defvar xit--checkbox-regexp "^\\(\\[[ |x|@|~]\\] \\)"
+  "The regpexp used to search for the checkbox.")
 
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.xit\\'" . xit-mode))
+(defvar xit--priority-regexp "\\([\\!|\\.]+ \\)"
+  "The regpexp used to search for the priority.")
+
+(defvar xit--checkbox-open-string "[ ] "
+  "The open checkbox string.")
+
+(defvar xit--checkbox-checked-string "[x] "
+  "The checked checkbox string.")
+
+(defvar xit--checkbox-ongoing-string "[@] "
+  "The progress checkbox string.")
+
+(defvar xit--checkbox-obsolete-string "[~] "
+  "The obsolete checkbox string.")
+
+(defun xit-new-item ()
+  "Create a new xit item."
+  (interactive)
+  (beginning-of-line)
+  (insert "[ ] \n")
+  (forward-line -1)
+  (end-of-line))
+
+(defun xit--item-replace-checkbox (reg rep)
+  "Replace the current item checkbox spotted by REG with REP."
+  (save-restriction
+    (narrow-to-region (line-beginning-position) (line-end-position))
+    (goto-char (point-min))
+    (when (re-search-forward reg nil t)
+      (replace-match rep))))
+
+(defun xit-item-open ()
+  "Set a xit item to open."
+  (interactive)
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-open-string))
+
+(defun xit-item-checked ()
+  "Set a xit item to checked."
+  (interactive)
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-checked-string))
+
+(defun xit-item-ongoing ()
+  "Set a xit item to ongoing."
+  (interactive)
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-ongoing-string))
+
+(defun xit-item-obsolete ()
+  "Set a xit item to obsolete."
+  (interactive)
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-obsolete-string))
+
+(defun xit-item-cycle ()
+  "Cycle through xitem states."
+  (interactive)
+  (save-restriction
+    (narrow-to-region (line-beginning-position) (line-end-position))
+    (goto-char (point-min))
+    (when (re-search-forward xit--checkbox-regexp nil t)
+      (let ((checkbox (match-string-no-properties 0)))
+        (cond
+         ((string-equal checkbox xit--checkbox-open-string)
+          (replace-match xit--checkbox-ongoing-string))
+         ((string-equal checkbox xit--checkbox-ongoing-string)
+          (replace-match xit--checkbox-checked-string))
+         ((string-equal checkbox xit--checkbox-checked-string)
+          (replace-match xit--checkbox-obsolete-string))
+         ((string-equal checkbox xit--checkbox-obsolete-string)
+          (replace-match xit--checkbox-open-string))
+         (t (warn "Checkbox not found")))))))
+
+(defun xit-item-inc-priority ()
+  "Increase item priority."
+  (interactive)
+  (save-restriction
+    (narrow-to-region (line-beginning-position) (line-end-position))
+    (goto-char (point-min))
+    (if (re-search-forward xit--priority-regexp nil t)
+        (replace-match (concat "!" (match-string-no-properties 1)))
+      (when (re-search-forward xit--checkbox-regexp nil t)
+        (replace-match "\\1! ")))))
+
+(defun xit-item-dec-priority ()
+  "Decrease item priority."
+  (interactive)
+  (save-restriction
+    (narrow-to-region (line-beginning-position) (line-end-position))
+    (goto-char (point-min))
+    (when (re-search-forward xit--priority-regexp nil t)
+      (let ((s (substring (match-string-no-properties 1) 1)))
+        (if (string-equal s " ")
+            (replace-match "")
+          (replace-match s))))))
+
+(defvar xit-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-n") 'xit-new-item)      ;; n for new
+    (define-key map (kbd "C-c C-o") 'xit-item-open)     ;; o for open
+    (define-key map (kbd "C-c C-d") 'xit-item-checked)  ;; d for done
+    (define-key map (kbd "C-c C-p") 'xit-item-ongoing)  ;; p for progress
+    (define-key map (kbd "C-c C-a") 'xit-item-obsolete) ;; a for archive
+    (define-key map (kbd "C-c C-c") 'xit-item-cycle)    ;; c for cycle
+    (define-key map (kbd "C-c C-<up>") 'xit-item-inc-priority)
+    (define-key map (kbd "C-c C-<down>") 'xit-item-dec-priority)
+    map)
+  "Keymap for `xit-mode'.")
 
 ;; descriptions disabled until tags in descriptions are resolved.
 ;; right now tags don't display if a description has a face.
@@ -113,15 +213,17 @@
   "Face used for tags."
   :group 'xit-faces)
 
-(defun xit-mode ()
-  "Major mode for [x]it!"
-  (interactive)
+(define-derived-mode xit-mode text-mode "[x]it!"
+  "Major mode for [x]it files."
   (kill-all-local-variables)
-  ;;(use-local-map xit-mode-map)
+  (use-local-map xit-mode-map)
   (setq font-lock-defaults '(xit-mode-font-lock-keywords))
   (setq major-mode 'xit-mode)
   (setq mode-name "[x]it!")
   (run-hooks 'xit-mode-hook))
+
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.xit\\'" . xit-mode))
 
 (provide 'xit-mode)
 ;;; xit-mode.el ends here

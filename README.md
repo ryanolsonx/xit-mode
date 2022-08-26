@@ -23,3 +23,29 @@ In your .emacs or init.el:
 (load "~/.emacs.d/xit-mode/xit-mode.el")
 (require 'xit-mode)
 ```
+
+## Key bindings
+
+### Creation
+
+In order to quickly create a new item, use `C-c C-n`. It simply adds a new open item and let you type the desired text.
+
+### Status
+
+When placing the cursor on a line containing an item, some keybindings can help to change its status:
+
+- `C-c C-o`: set the item as open (`[ ]`)
+- `C-c C-d`: set the item as done (`[x]`)
+- `C-c C-p`: set the item as in progress (`[@]`)
+- `C-c C-a`: set the item as archived, a.k.a obsolete (`[~]`)
+
+Additionally, there is a keybinding that cycle through these status:
+
+- `C-c C-c`: cycle through the different status (`open` -> `in progress` -> `done` -> `archived`)
+
+### Priority
+
+In the same condition, it is possible to change the item's priority with the following keybindings:
+
+- `C-c C-<up>`: increase the priority (by adding a `!`)
+- `C-c C-<down>`: decrease the priority (by removing a `!` or a `.`)
