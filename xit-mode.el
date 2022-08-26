@@ -5,7 +5,9 @@
 ;; Copyright (C) 2022 Ryan Olson
 
 ;; Authors: Ryan Olson <ryolson@me.com>
-;; Keywords: xit todo
+;; URL: https://github.com/ryanolsonx/xit-mode
+;; Version: 0.2
+;; Keywords: xit, todo, tools, convinience, project
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -22,17 +24,100 @@
 
 ;;; Commentary:
 
+;; Versions:
 ;;
+;;   - 0.2 adding interactivity with keybindings and imenu support
+;;   - 0.1 initial release with syntax color support
 
 ;;; Code:
 
+;; Faces
+
+(defface xit-group-title-face
+  '((t :inherit (bold underline)))
+  "Face used for checkboxes group title"
+  :group 'xit-faces)
+
+(defface xit-open-checkbox-face
+  '((t :inherit font-lock-function-name-face))
+  "Face used for open checkbox."
+  :group 'xit-faces)
+
+(defface xit-open-description-face
+  '((t :inherit default))
+  "Face used for open checkbox description."
+  :group 'xit-faces)
+
+(defface xit-checked-checkbox-face
+  '((t :inherit success))
+  "Face used for checked checkbox."
+  :group 'xit-faces)
+
+(defface xit-checked-description-face
+  '((t :inherit font-lock-comment-face))
+  "Face used for checked checkbox description."
+  :group 'xit-faces)
+
+(defface xit-ongoing-checkbox-face
+  '((t :inherit font-lock-keyword-face))
+  "Face used for ongoing checkbox."
+  :group 'xit-faces)
+
+(defface xit-ongoing-description-face
+  '((t :inherit default))
+  "Face used for ongoing checkbox description."
+  :group 'xit-faces)
+
+(defface xit-obsolete-checkbox-face
+  '((t :inherit font-lock-comment-delimiter-face))
+  "Face used for obsolete checkbox."
+  :group 'xit-faces)
+
+(defface xit-obsolete-description-face
+  '((t :inherit font-lock-comment-face))
+  "Face used for obsolete checkbox description."
+  :group 'xit-faces)
+
+(defface xit-priority-face
+  '((t :inherit error))
+  "Face used for priority markers ! or ."
+  :group 'xit-faces)
+
+(defface xit-tag-face
+  '((t :inherit font-lock-constant-face))
+  "Face used for tags."
+  :group 'xit-faces)
+
+;; Variables
+
 (defvar xit-mode-hook nil)
+
+(defvar xit--group-title-regexp "^[a-zA-Z]+.*$"
+  "The regepx used to search for group titles.")
+
+(defvar xit--open-checkbox-regexp "^\\(\\[ \\]\\) [\\!|\\.]*\\(.*\\)"
+  "The regepx used to search for open checkboxes.")
+
+(defvar xit--checked-checkbox-regexp "^\\(\\[x\\]\\) \\(.*\\)"
+  "The regepx used to search for checked checkboxes.")
+
+(defvar xit--ongoing-checkbox-regexp "^\\(\\[@\\]\\) [\\!|\\.]*\\(.*\\)"
+  "The regepx used to search for ongoing checkboxes.")
+
+(defvar xit--obsolete-checkbox-regexp "^\\(\\[~\\]\\) \\(.*\\)"
+  "The regepx used to search for obsolete checkboxes.")
 
 (defvar xit--checkbox-regexp "^\\(\\[[ |x|@|~]\\] \\)"
   "The regpexp used to search for the checkbox.")
 
 (defvar xit--priority-regexp "\\([\\!|\\.]+ \\)"
   "The regpexp used to search for the priority.")
+
+(defvar xit--checkbox-priority-regexp "^\\[[x|@| |~]\\] \\([\\!|\\.]+\\)[^\\!|\\.]"
+  "The regpexp used to search for the checkbox and the priority.")
+
+(defvar xit--tag-regexp "#[a-zA-Z0-9\\-_]+"
+  "The regpexp used to search for tags.")
 
 (defvar xit--checkbox-open-string "[ ] "
   "The open checkbox string.")
@@ -46,8 +131,10 @@
 (defvar xit--checkbox-obsolete-string "[~] "
   "The obsolete checkbox string.")
 
+;; Keymap functions
+
 (defun xit-new-item ()
-  "Create a new xit item."
+  "Create a new open item."
   (interactive)
   (beginning-of-line)
   (insert "[ ] \n")
@@ -62,28 +149,28 @@
     (when (re-search-forward reg nil t)
       (replace-match rep))))
 
-(defun xit-item-open ()
-  "Set a xit item to open."
+(defun xit-open-item ()
+  "Set an item as open."
   (interactive)
   (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-open-string))
 
-(defun xit-item-checked ()
-  "Set a xit item to checked."
+(defun xit-checked-item ()
+  "Set an item as checked."
   (interactive)
   (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-checked-string))
 
-(defun xit-item-ongoing ()
-  "Set a xit item to ongoing."
+(defun xit-ongoing-item ()
+  "Set an item as ongoing."
   (interactive)
   (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-ongoing-string))
 
-(defun xit-item-obsolete ()
-  "Set a xit item to obsolete."
+(defun xit-obsolete-item ()
+  "Set an item as obsolete."
   (interactive)
   (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-obsolete-string))
 
-(defun xit-item-cycle ()
-  "Cycle through xitem states."
+(defun xit-state-cycle-item ()
+  "Cycle through items states."
   (interactive)
   (save-restriction
     (narrow-to-region (line-beginning-position) (line-end-position))
@@ -101,7 +188,7 @@
           (replace-match xit--checkbox-open-string))
          (t (warn "Checkbox not found")))))))
 
-(defun xit-item-inc-priority ()
+(defun xit-inc-priority-item ()
   "Increase item priority."
   (interactive)
   (save-restriction
@@ -112,7 +199,7 @@
       (when (re-search-forward xit--checkbox-regexp nil t)
         (replace-match "\\1! ")))))
 
-(defun xit-item-dec-priority ()
+(defun xit-dec-priority-item ()
   "Decrease item priority."
   (interactive)
   (save-restriction
@@ -124,94 +211,45 @@
             (replace-match "")
           (replace-match s))))))
 
+;; Keymap definition
+
 (defvar xit-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-n") 'xit-new-item)      ;; n for new
-    (define-key map (kbd "C-c C-o") 'xit-item-open)     ;; o for open
-    (define-key map (kbd "C-c C-d") 'xit-item-checked)  ;; d for done
-    (define-key map (kbd "C-c C-p") 'xit-item-ongoing)  ;; p for progress
-    (define-key map (kbd "C-c C-a") 'xit-item-obsolete) ;; a for archive
-    (define-key map (kbd "C-c C-c") 'xit-item-cycle)    ;; c for cycle
-    (define-key map (kbd "C-c C-<up>") 'xit-item-inc-priority)
-    (define-key map (kbd "C-c C-<down>") 'xit-item-dec-priority)
+    (define-key map (kbd "C-c C-n") 'xit-new-item) ;; n for new
+    (define-key map (kbd "C-c C-o") 'xit-open-item) ;; o for open
+    (define-key map (kbd "C-c C-d") 'xit-checked-item) ;; d for done
+    (define-key map (kbd "C-c C-p") 'xit-ongoing-item) ;; p for progress
+    (define-key map (kbd "C-c C-a") 'xit-obsolete-item) ;; a for archive
+    (define-key map (kbd "C-c C-c") 'xit-state-cycle-item) ;; c for cycle
+    (define-key map (kbd "C-c C-<up>") 'xit-inc-priority-item)
+    (define-key map (kbd "C-c C-<down>") 'xit-dec-priority-item)
     map)
   "Keymap for `xit-mode'.")
+
+;; Syntax highlighting
 
 ;; descriptions disabled until tags in descriptions are resolved.
 ;; right now tags don't display if a description has a face.
 (defvar xit-mode-font-lock-keywords
   (list
-   '("^[a-zA-Z]+.*$" 0 'xit-group-title)
-   '("^\\(\\[ \\]\\) [\\!|\\.]*\\(.*\\)"
-     (1 'xit-open-checkbox))
-     ;(2 'xit-open-description))
-   '("^\\(\\[x\\]\\) \\(.*\\)"
-     (1 'xit-checked-checkbox))
-     ;(2 'xit-checked-description))
-   '("^\\(\\[@\\]\\) [\\!|\\.]*\\(.*\\)"
-     (1 'xit-ongoing-checkbox))
-     ;(2 'xit-ongoing-description))
-   '("^\\(\\[~\\]\\) \\(.*\\)"
-     (1 'xit-obsolete-checkbox)
-     (2 'xit-obsolete-description))
-   '("^\\[[x|@| |~]\\] \\([\\!|\\.]+\\)[^\\!|\\.]" 1 'xit-priority)
-   '("#[a-zA-Z0-9\\-_]+" 0 'xit-tag))
+   `(,xit--group-title-regexp 0 'xit-group-title-face)
+   `(,xit--open-checkbox-regexp
+     (1 'xit-open-checkbox-face))
+     ;(2 'xit-open-description-face))
+   `(,xit--checked-checkbox-regexp
+     (1 'xit-checked-checkbox-face))
+     ;(2 'xit-checked-description-face))
+   `(,xit--ongoing-checkbox-regexp
+     (1 'xit-ongoing-checkbox-face))
+     ;(2 'xit-ongoing-description-face))
+   `(,xit--obsolete-checkbox-regexp
+     (1 'xit-obsolete-checkbox-face)
+     (2 'xit-obsolete-description-face))
+   `(,xit--checkbox-priority-regexp 1 'xit-priority-face)
+   `(,xit--tag-regexp 0 'xit-tag-face))
   "Highlighting specification for `xit-mode'.")
 
-(defface xit-group-title
-  '((t :inherit (bold underline)))
-  "Face used for checkboxes group title"
-  :group 'xit-faces)
-
-(defface xit-open-checkbox
-  '((t :inherit font-lock-function-name-face))
-  "Face used for open checkbox."
-  :group 'xit-faces)
-
-(defface xit-open-description
-  '((t :inherit default))
-  "Face used for open checkbox description."
-  :group 'xit-faces)
-
-(defface xit-checked-checkbox
-  '((t :inherit success))
-  "Face used for checked checkbox."
-  :group 'xit-faces)
-
-(defface xit-checked-description
-  '((t :inherit font-lock-comment-face))
-  "Face used for checked checkbox description."
-  :group 'xit-faces)
-
-(defface xit-ongoing-checkbox
-  '((t :inherit font-lock-keyword-face))
-  "Face used for ongoing checkbox."
-  :group 'xit-faces)
-
-(defface xit-ongoing-description
-  '((t :inherit default))
-  "Face used for ongoing checkbox description."
-  :group 'xit-faces)
-
-(defface xit-obsolete-checkbox
-  '((t :inherit font-lock-comment-delimiter-face))
-  "Face used for obsolete checkbox."
-  :group 'xit-faces)
-
-(defface xit-obsolete-description
-  '((t :inherit font-lock-comment-face))
-  "Face used for obsolete checkbox description."
-  :group 'xit-faces)
-
-(defface xit-priority
-  '((t :inherit error))
-  "Face used for priority markers ! or ."
-  :group 'xit-faces)
-
-(defface xit-tag
-  '((t :inherit font-lock-constant-face))
-  "Face used for tags."
-  :group 'xit-faces)
+;; Mode definition
 
 (define-derived-mode xit-mode text-mode "[x]it!"
   "Major mode for [x]it files."
