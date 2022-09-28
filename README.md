@@ -24,6 +24,12 @@ In your .emacs or init.el:
 (require 'xit-mode)
 ```
 
+## Features
+
+- Syntax highlighting with customizable faces
+- Item state and priority management via keybindings
+- `imenu` support
+
 ## Key bindings
 
 - `C-c C-n` (`M-x xit-new-item`) : Create a new open item
@@ -35,7 +41,9 @@ In your .emacs or init.el:
 - `C-c C-<up>` (`M-x xit-inc-priority-item`) : Increase the priority by adding a `!`
 - `C-c C-<down>` (`M-x xit-dec-priority-item`) : Decrease the priority by removing a `!` or a `.`
 
-## Customizable faces
+## Customizable variables
+
+### Faces
 
 Here is the list of the faces used in the `xit-faces` group:
 
@@ -49,3 +57,10 @@ Here is the list of the faces used in the `xit-faces` group:
 - `xit-obsolete-description-face`
 - `xit-priority-face`
 - `xit-tag-face`
+
+### Imenu
+
+Imenu can be customized via the variable `xit-imenu-function`. Its possible values are:
+
+- `'xit-imenu-groups` to list only groups
+- `'xit-imenu-groups-and-items` to list groups and items

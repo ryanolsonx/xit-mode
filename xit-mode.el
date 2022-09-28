@@ -92,6 +92,8 @@
 
 (defvar xit-mode-hook nil)
 
+(defvar xit-imenu-function 'xit-imenu-groups-and-items)
+
 (defvar xit--group-title-regexp "^[a-zA-Z]+.*$"
   "The regepx used to search for group titles.")
 
@@ -249,6 +251,53 @@
    `(,xit--tag-regexp 0 'xit-tag-face))
   "Highlighting specification for `xit-mode'.")
 
+;; Imenu support
+
+(defun xit-imenu-groups ()
+  "Extract groups for imenu index from the current file."
+  (let ((imenu-data '()))
+    (save-excursion
+      (goto-char (point-min))
+      (save-match-data
+        (while (re-search-forward xit--group-title-regexp nil t)
+          (push (cons (match-string-no-properties 0)
+                      (car (match-data 1)))
+                imenu-data))))
+    imenu-data))
+
+(defun xit-imenu-groups-and-items ()
+  "Extract groups and items for imenu index from the current file."
+  (let ((imenu-data '())
+        (items-buffer '())
+        (last-group ""))
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eobp))
+        (let* ((line (substring-no-properties (buffer-substring (point) (point-at-eol))))
+               (trimmed-line (replace-regexp-in-string "\n$" "" line))
+               (item-text (replace-regexp-in-string
+                           xit--checkbox-regexp ""
+                           (replace-regexp-in-string
+                            xit--priority-regexp ""
+                            trimmed-line))))
+          (cond ((string-match xit--checkbox-regexp line)
+                 (push (cons item-text (point)) items-buffer))
+                ((string-match xit--group-title-regexp line)
+                 (setq last-group trimmed-line))
+                ((string-match "" line)
+                 (when (not (null items-buffer))
+                   (if (not (string-equal last-group ""))
+                       (push (cons last-group (nreverse items-buffer)) imenu-data)
+                     (setq imenu-data (append items-buffer imenu-data))))
+                 (setq last-group "")
+                 (setq items-buffer '()))))
+        (beginning-of-line 2))
+      (when (not (null items-buffer))
+        (if (not (string-equal last-group ""))
+            (push (cons last-group (nreverse items-buffer)) imenu-data)
+          (setq imenu-data (append items-buffer imenu-data)))))
+    (nreverse imenu-data)))
+
 ;; Mode definition
 
 ;;;###autoload
@@ -259,6 +308,8 @@
   (setq font-lock-defaults '(xit-mode-font-lock-keywords))
   (setq major-mode 'xit-mode)
   (setq mode-name "[x]it!")
+  (setq imenu-sort-function 'imenu--sort-by-name)
+  (setq imenu-create-index-function xit-imenu-function)
   (run-hooks 'xit-mode-hook))
 
 ;;;###autoload
