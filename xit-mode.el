@@ -251,6 +251,7 @@
 
 ;; Mode definition
 
+;;;###autoload
 (define-derived-mode xit-mode text-mode "[x]it!"
   "Major mode for [x]it files."
   (kill-all-local-variables)
