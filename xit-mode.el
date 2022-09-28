@@ -35,7 +35,7 @@
 
 (defface xit-group-title-face
   '((t :inherit (bold underline)))
-  "Face used for checkboxes group title"
+  "Face used for checkboxes group title."
   :group 'xit-faces)
 
 (defface xit-open-checkbox-face
