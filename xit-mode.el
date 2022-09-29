@@ -1,4 +1,4 @@
-;;; xit-mode.el --- A [x]it! major mode for Emacs. -*- lexical-binding: t; -*-
+;;; xit-mode.el --- A [x]it! major mode -*- lexical-binding: t; -*-
 
 ;; See: https://xit.jotaen.net/
 
@@ -7,6 +7,7 @@
 ;; Authors: Ryan Olson <ryolson@me.com>
 ;; URL: https://github.com/ryanolsonx/xit-mode
 ;; Version: 0.2
+;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: xit, todo, tools, convinience, project
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -237,13 +238,13 @@
    `(,xit--group-title-regexp 0 'xit-group-title-face)
    `(,xit--open-checkbox-regexp
      (1 'xit-open-checkbox-face))
-     ;(2 'xit-open-description-face))
+     ;;(2 'xit-open-description-face))
    `(,xit--checked-checkbox-regexp
      (1 'xit-checked-checkbox-face))
-     ;(2 'xit-checked-description-face))
+     ;;(2 'xit-checked-description-face))
    `(,xit--ongoing-checkbox-regexp
      (1 'xit-ongoing-checkbox-face))
-     ;(2 'xit-ongoing-description-face))
+     ;;(2 'xit-ongoing-description-face))
    `(,xit--obsolete-checkbox-regexp
      (1 'xit-obsolete-checkbox-face)
      (2 'xit-obsolete-description-face))
@@ -303,11 +304,8 @@
 ;;;###autoload
 (define-derived-mode xit-mode text-mode "[x]it!"
   "Major mode for [x]it files."
-  (kill-all-local-variables)
   (use-local-map xit-mode-map)
   (setq font-lock-defaults '(xit-mode-font-lock-keywords))
-  (setq major-mode 'xit-mode)
-  (setq mode-name "[x]it!")
   (setq imenu-sort-function 'imenu--sort-by-name)
   (setq imenu-create-index-function xit-imenu-function)
   (run-hooks 'xit-mode-hook))
