@@ -6,16 +6,34 @@
 
 ## Installation
 
-As this is WIP, it's not available on Melpa. When it's more complete, it'll be in Melpa. So for now, to use this, you'll need to:
+### Melpa
 
-### 1. Download the package
+`xit-mode` has a recipe in the [melpa repository](https://github.com/melpa/melpa) to ease its installation.
+
+You can use the command `M-x package-install` and then select the `xit-mode` package to install it automatically.
+
+### use-package
+
+You can also rely on the [use-package](https://github.com/jwiegley/use-package) configuration helper to ease the installation and configuration from your `.emacs` file.
+
+Just add the following snippet to your config file:
+
+``` elisp
+(use-package xit-mode :ensure t)
+```
+
+### Manual
+
+Alternatively, you can still install the mode manually by following these steps:
+
+#### 1. Download the package
 
 ```bash
 cd ~/.emacs.d/
 git clone https://github.com/ryanolsonx/xit-mode
 ```
 
-### 2. Load it in Emacs
+#### 2. Load it in Emacs
 
 In your .emacs or init.el:
 
