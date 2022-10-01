@@ -6,7 +6,7 @@
 
 ;; Authors: Ryan Olson <ryolson@me.com>
 ;; URL: https://github.com/ryanolsonx/xit-mode
-;; Version: 0.2
+;; Version: 0.3
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: xit, todo, tools, convinience, project
 
@@ -27,6 +27,7 @@
 
 ;; Versions:
 ;;
+;;   - 0.3 melpa recipe is now available
 ;;   - 0.2 adding interactivity with keybindings and imenu support
 ;;   - 0.1 initial release with syntax color support
 
