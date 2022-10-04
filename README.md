@@ -1,6 +1,6 @@
 # xit-mode
 
-[x]it! is a plain-text file format for todos and check lists. This is an Emacs major mode that gives highlighting for .xit files.
+[x]it! is a plain-text file format for todos and check lists (see [format reference here](https://xit.jotaen.net/)). This is an Emacs major mode that gives highlighting and interactivity for .xit files.
 
 ![Screenshot](https://raw.githubusercontent.com/ryanolsonx/xit-mode/main/screenshot.png "Screenshot of Emacs [x]it!")
 
