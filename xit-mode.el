@@ -27,11 +27,14 @@
 
 ;; Versions:
 ;;
+;;   - 0.4 dates support
 ;;   - 0.3 melpa recipe is now available
 ;;   - 0.2 adding interactivity with keybindings and imenu support
 ;;   - 0.1 initial release with syntax color support
 
 ;;; Code:
+
+(require 'calendar)
 
 ;; Faces
 
@@ -235,6 +238,7 @@
     (define-key map (kbd "C-c C-c") 'xit-state-cycle-item) ;; c for cycle
     (define-key map (kbd "C-c C-<up>") 'xit-inc-priority-item)
     (define-key map (kbd "C-c C-<down>") 'xit-dec-priority-item)
+    (define-key map (kbd "C-c C-w") 'xit-insert-date) ;; w for when
     map)
   "Keymap for `xit-mode'.")
 
@@ -308,6 +312,13 @@
             (push (cons last-group (nreverse items-buffer)) imenu-data)
           (setq imenu-data (append items-buffer imenu-data)))))
     (nreverse imenu-data)))
+
+;; Dates
+
+(defun xit-insert-date (date)
+  "Insert DATE at point."
+  (interactive (list (calendar-read-date)))
+  (insert (format "-> %d-%d-%d" (nth 2 date) (nth 1 date) (nth 0 date))))
 
 ;; Mode definition
 

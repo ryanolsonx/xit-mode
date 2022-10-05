@@ -47,6 +47,7 @@ In your .emacs or init.el:
 - Syntax highlighting with customizable faces
 - Item state and priority management via keybindings
 - `imenu` support
+- Dates support
 
 ## Key bindings
 
@@ -58,6 +59,7 @@ In your .emacs or init.el:
 - `C-c C-C` (`M-x xit-state-cycle-item `) : Cycle through the different states (`open` -> `ongoing` -> `checked` -> `obsolete`)
 - `C-c C-<up>` (`M-x xit-inc-priority-item`) : Increase the priority by adding a `!`
 - `C-c C-<down>` (`M-x xit-dec-priority-item`) : Decrease the priority by removing a `!` or a `.`
+- `C-c C-w` (`M-x xit-insert-date`) : Insert a formatted date
 
 ## Customizable variables
 
