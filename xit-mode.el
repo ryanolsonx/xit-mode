@@ -90,6 +90,11 @@
   "Face used for tags."
   :group 'xit-faces)
 
+(defface xit-date-face
+  '((t :inherit font-lock-doc-face))
+  "Face used for dates."
+  :group 'xit-faces)
+
 ;; Variables
 
 (defvar xit-mode-hook nil)
@@ -122,6 +127,9 @@
 
 (defvar xit--tag-regexp "#[a-zA-Z0-9\\-_]+"
   "The regpexp used to search for tags.")
+
+(defvar xit--date-regexp "\\-> [0-9]+\\([-|\\/][Q|W]*[0-9]+\\)?\\([-|\\/][0-9]+\\)?"
+  "The regpexp used to search for dates.")
 
 (defvar xit--checkbox-open-string "[ ] "
   "The open checkbox string.")
@@ -250,7 +258,8 @@
      (1 'xit-obsolete-checkbox-face)
      (2 'xit-obsolete-description-face))
    `(,xit--checkbox-priority-regexp 1 'xit-priority-face)
-   `(,xit--tag-regexp 0 'xit-tag-face))
+   `(,xit--tag-regexp 0 'xit-tag-face)
+   `(,xit--date-regexp 0 'xit-date-face))
   "Highlighting specification for `xit-mode'.")
 
 ;; Imenu support
