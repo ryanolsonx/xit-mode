@@ -93,6 +93,11 @@
   "Face used for tags."
   :group 'xit-faces)
 
+(defface xit-tag-value-face
+  '((t :inherit font-lock-keyword-face))
+  "Face used for tags value."
+  :group 'xit-faces)
+
 (defface xit-date-face
   '((t :inherit font-lock-doc-face))
   "Face used for dates."
@@ -128,8 +133,17 @@
 (defvar xit--checkbox-priority-regexp "^\\[[x|@| |~]\\] \\([\\!|\\.]+\\)[^\\!|\\.]"
   "The regpexp used to search for the checkbox and the priority.")
 
-(defvar xit--tag-regexp "#[a-zA-Z0-9\\-_]+"
+(defvar xit--tag-regexp "#[a-zA-Z0-9]+"
   "The regpexp used to search for tags.")
+
+(defvar xit--tag-with-value-regexp "\\(#[a-zA-Z0-9]+\\)=\\([a-zA-Z0-9]+\\)"
+  "The regpexp used to search for tags with value.")
+
+(defvar xit--tag-with-quoted-value-regexp "\\(#[a-zA-Z0-9]+\\)='\\([^']+\\)'"
+  "The regpexp used to search for tags with quoted value.")
+
+(defvar xit--tag-with-double-quoted-value-regexp "\\(#[a-zA-Z0-9]+\\)=\\\"\\([^\\\"]+\\)\\\""
+  "The regpexp used to search for tags with double quoted value.")
 
 (defvar xit--date-regexp "\\-> [0-9]+\\([-|\\/][Q|W]*[0-9]+\\)?\\([-|\\/][0-9]+\\)?"
   "The regpexp used to search for dates.")
@@ -263,6 +277,15 @@
      (2 'xit-obsolete-description-face))
    `(,xit--checkbox-priority-regexp 1 'xit-priority-face)
    `(,xit--tag-regexp 0 'xit-tag-face)
+   `(,xit--tag-with-value-regexp
+     (1 'xit-tag-face)
+     (2 'xit-tag-value-face))
+   `(,xit--tag-with-quoted-value-regexp
+     (1 'xit-tag-face)
+     (2 'xit-tag-value-face))
+   `(,xit--tag-with-double-quoted-value-regexp
+     (1 'xit-tag-face)
+     (2 'xit-tag-value-face))
    `(,xit--date-regexp 0 'xit-date-face))
   "Highlighting specification for `xit-mode'.")
 
