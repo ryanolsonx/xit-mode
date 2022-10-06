@@ -77,6 +77,7 @@ Here is the list of the faces used in the `xit-faces` group:
 - `xit-obsolete-description-face`
 - `xit-priority-face`
 - `xit-tag-face`
+- `xit-tag-value-face`
 - `xit-date-face`
 
 ### Imenu
