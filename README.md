@@ -46,6 +46,7 @@ In your .emacs or init.el:
 
 - Syntax highlighting with customizable faces
 - Item state and priority management via keybindings
+- Move items to a section via completion
 - `imenu` support
 - Dates support
 
@@ -60,6 +61,7 @@ In your .emacs or init.el:
 - `C-c C-<up>` (`M-x xit-inc-priority-item`) : Increase the priority by adding a `!`
 - `C-c C-<down>` (`M-x xit-dec-priority-item`) : Decrease the priority by removing a `!` or a `.`
 - `C-c C-w` (`M-x xit-insert-date`) : Insert a formatted date
+- `C-c C-m` (`M-x xit-move-item-to-section`) : Move an item to the bottom of a section, chosen via completion (only available when the buffer has sections)
 
 ## Customizable variables
 

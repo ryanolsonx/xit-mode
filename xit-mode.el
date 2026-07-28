@@ -6,7 +6,7 @@
 
 ;; Authors: Ryan Olson <ryolson@me.com>, Pierre Lecocq <pierre.lecocq@gmail.com>
 ;; URL: https://github.com/ryanolsonx/xit-mode
-;; Version: 0.4
+;; Version: 0.5
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: xit, todo, tools, convinience, project
 
@@ -27,6 +27,7 @@
 
 ;; Versions:
 ;;
+;;   - 0.5 move items to section
 ;;   - 0.4 dates support
 ;;   - 0.3 melpa recipe is now available
 ;;   - 0.2 adding interactivity with keybindings and imenu support
@@ -245,6 +246,84 @@ Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
             (replace-match "")
           (replace-match s))))))
 
+(defun xit--collect-sections ()
+  "Return an alist of (TITLE . POSITION) for the sections in the buffer.
+Sections are ordered as they appear in the buffer."
+  (let (sections)
+    (save-excursion
+      (save-match-data
+        (goto-char (point-min))
+        (while (re-search-forward xit--group-title-regexp nil t)
+          (push (cons (match-string-no-properties 0) (match-beginning 0)) sections))))
+    (nreverse sections)))
+
+(defun xit--last-content-point (start boundary default)
+  "Return the position right after the last non-blank line in [START, BOUNDARY).
+The returned position always begins a line (or is `point-max').  Return
+DEFAULT if no non-blank line is found in that range."
+  (save-excursion
+    (save-match-data
+      (goto-char start)
+      (let ((last-content-point default))
+        (while (< (point) boundary)
+          (let ((blank (looking-at-p "^[ \t]*$")))
+            (forward-line 1)
+            (unless blank
+              (setq last-content-point (point)))))
+        last-content-point))))
+
+(defun xit--section-insertion-point (section-start)
+  "Return the position at the bottom of the section starting at SECTION-START.
+That is, the position right after the section's last non-blank line, or
+right after the section title itself if the section has no items yet."
+  (save-excursion
+    (save-match-data
+      (goto-char section-start)
+      (forward-line 1)
+      (let ((after-title (point))
+            (boundary (if (re-search-forward xit--group-title-regexp nil t)
+                          (match-beginning 0)
+                        (point-max))))
+        (xit--last-content-point after-title boundary after-title)))))
+
+(defun xit--top-insertion-point (first-section-start)
+  "Return the position at the bottom of the file's top, ungrouped area.
+FIRST-SECTION-START is the position where the first section begins."
+  (xit--last-content-point (point-min) first-section-start (point-min)))
+
+(defun xit-move-item-to-section ()
+  "Move the item at point to the bottom of a section chosen via completion.
+Only available when the buffer contains at least one section.  Leaving the
+selection empty moves the item to the top of the file, outside of any
+section; if the item is already outside of any section, it is left as is."
+  (interactive)
+  (let ((sections (xit--collect-sections)))
+    (unless sections
+      (user-error "This buffer has no sections to move items to"))
+    (unless (save-excursion
+              (beginning-of-line)
+              (looking-at-p xit--checkbox-regexp))
+      (user-error "No item at point"))
+    (let* ((choice (completing-read "Move item to section: "
+                                     (mapcar #'car sections) nil t))
+           (section-start (cdr (assoc choice sections)))
+           (first-section-start (cdr (car sections)))
+           (item-start (line-beginning-position))
+           (item-end (min (point-max) (1+ (line-end-position))))
+           (item-text (buffer-substring item-start (line-end-position))))
+      (cond
+       (section-start
+        (delete-region item-start item-end)
+        (when (> section-start item-start)
+          (setq section-start (- section-start (- item-end item-start))))
+        (goto-char (xit--section-insertion-point section-start))
+        (insert item-text "\n"))
+       ((> item-start first-section-start)
+        (delete-region item-start item-end)
+        (goto-char (xit--top-insertion-point first-section-start))
+        (insert item-text "\n"))
+       (t nil)))))
+
 ;; Keymap definition
 
 (defvar xit-mode-map
@@ -258,6 +337,7 @@ Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
     (define-key map (kbd "C-c C-<up>") 'xit-inc-priority-item)
     (define-key map (kbd "C-c C-<down>") 'xit-dec-priority-item)
     (define-key map (kbd "C-c C-w") 'xit-insert-date) ;; w for when
+    (define-key map (kbd "C-c C-m") 'xit-move-item-to-section) ;; m for move
     map)
   "Keymap for `xit-mode'.")
 
