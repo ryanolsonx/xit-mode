@@ -314,7 +314,7 @@
     (save-excursion
       (goto-char (point-min))
       (while (not (eobp))
-        (let* ((line (substring-no-properties (buffer-substring (point) (point-at-eol))))
+        (let* ((line (substring-no-properties (buffer-substring (point) (line-end-position))))
                (trimmed-line (replace-regexp-in-string "\n$" "" line))
                (item-text (replace-regexp-in-string
                            xit--checkbox-regexp ""
