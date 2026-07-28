@@ -107,22 +107,24 @@
 
 (defvar xit-mode-hook nil)
 
-(defvar xit-imenu-function 'xit-imenu-groups-and-items)
+(defvar xit-imenu-function 'xit-imenu-groups-and-items
+  "The function used to build the imenu index.
+Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
 
 (defvar xit--group-title-regexp "^[a-zA-Z]+.*$"
-  "The regepx used to search for group titles.")
+  "The regexp used to search for group titles.")
 
 (defvar xit--open-checkbox-regexp "^\\(\\[ \\]\\) [!.]*\\(.*\\)"
-  "The regepx used to search for open checkboxes.")
+  "The regexp used to search for open checkboxes.")
 
 (defvar xit--checked-checkbox-regexp "^\\(\\[x\\]\\) \\(.*\\)"
-  "The regepx used to search for checked checkboxes.")
+  "The regexp used to search for checked checkboxes.")
 
 (defvar xit--ongoing-checkbox-regexp "^\\(\\[@\\]\\) [!.]*\\(.*\\)"
-  "The regepx used to search for ongoing checkboxes.")
+  "The regexp used to search for ongoing checkboxes.")
 
 (defvar xit--obsolete-checkbox-regexp "^\\(\\[~\\]\\) \\(.*\\)"
-  "The regepx used to search for obsolete checkboxes.")
+  "The regexp used to search for obsolete checkboxes.")
 
 (defvar xit--checkbox-regexp "^\\(\\[[ x@~]\\] \\)"
   "The regpexp used to search for the checkbox.")
