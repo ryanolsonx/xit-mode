@@ -90,6 +90,11 @@
   "Face used for in question checkbox."
   :group 'xit-faces)
 
+(defface xit-in-question-description-face
+  '((t :inherit default))
+  "Face used for in question checkbox description."
+  :group 'xit-faces)
+
 (defface xit-priority-face
   '((t :inherit error))
   "Face used for priority markers ! or ."

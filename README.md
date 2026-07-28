@@ -79,6 +79,7 @@ Here is the list of the faces used in the `xit-faces` group:
 - `xit-obsolete-checkbox-face`
 - `xit-obsolete-description-face`
 - `xit-in-question-checkbox-face`
+- `xit-in-question-description-face`
 - `xit-priority-face`
 - `xit-tag-face`
 - `xit-tag-value-face`
