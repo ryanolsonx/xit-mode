@@ -58,7 +58,7 @@ In your .emacs or init.el:
 - `C-c C-p` (`M-x xit-ongoing-item`) : Set an item as ongoing (`[@]`)
 - `C-c C-a` (`M-x xit-obsolete-item`) : Set an item as obsolete (`[!]`)
 - `C-c C-q` (`M-x xit-in-question-item`) : Set an item as in question (`[?]`)
-- `C-c C-C` (`M-x xit-state-cycle-item `) : Cycle through the different states (`open` -> `ongoing` -> `in question` -> `checked` -> `obsolete`)
+- `C-c C-s` (`M-x xit-state-cycle-item `) : Cycle through the different states (`open` -> `ongoing` -> `in question` -> `checked` -> `obsolete`)
 - `C-c C-<up>` (`M-x xit-inc-priority-item`) : Increase the priority by adding a `!`
 - `C-c C-<down>` (`M-x xit-dec-priority-item`) : Decrease the priority by removing a `!` or a `.`
 - `C-c C-w` (`M-x xit-insert-date`) : Insert a formatted date

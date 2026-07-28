@@ -401,7 +401,7 @@ section; if the item is already outside of any section, it is left as is."
     (define-key map (kbd "C-c C-p") 'xit-ongoing-item) ;; p for progress
     (define-key map (kbd "C-c C-a") 'xit-obsolete-item) ;; a for archive
     (define-key map (kbd "C-c C-q") 'xit-in-question-item) ;; q for question
-    (define-key map (kbd "C-c C-c") 'xit-state-cycle-item) ;; c for cycle
+    (define-key map (kbd "C-c C-s") 'xit-state-cycle-item) ;; s for state
     (define-key map (kbd "C-c C-<up>") 'xit-inc-priority-item)
     (define-key map (kbd "C-c C-<down>") 'xit-dec-priority-item)
     (define-key map (kbd "C-c C-w") 'xit-insert-date) ;; w for when
