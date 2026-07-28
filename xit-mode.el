@@ -4,9 +4,9 @@
 
 ;; Copyright (C) 2022 Ryan Olson
 
-;; Authors: Ryan Olson <ryolson@me.com>
+;; Authors: Ryan Olson <ryolson@me.com>, Pierre Lecocq <pierre.lecocq@gmail.com>
 ;; URL: https://github.com/ryanolsonx/xit-mode
-;; Version: 0.3
+;; Version: 0.4
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: xit, todo, tools, convinience, project
 
