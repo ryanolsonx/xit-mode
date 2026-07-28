@@ -122,7 +122,8 @@
 
 (defvar xit-imenu-function 'xit-imenu-groups-and-items
   "The function used to build the imenu index.
-Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
+Can be `xit-imenu-groups', `xit-imenu-groups-and-items', or
+`xit-imenu-tags'.")
 
 (defvar xit--group-title-regexp "^[^ \t\n\u00A0[].*$"
   "The regexp used to search for group titles.
@@ -490,6 +491,43 @@ section; if the item is already outside of any section, it is left as is."
             (push (cons last-group (nreverse items-buffer)) imenu-data)
           (setq imenu-data (append items-buffer imenu-data)))))
     (nreverse imenu-data)))
+
+(defun xit-imenu-tags ()
+  "Extract items grouped by tag for imenu index from the current file.
+Tags are matched case-insensitively, and an item carrying more than one
+tag appears under each of them.  Items with no tag at all are collected
+under a \"(no tag)\" group."
+  (let (tag-items untagged)
+    (save-excursion
+      (goto-char (point-min))
+      (save-match-data
+        (while (not (eobp))
+          (let ((line (buffer-substring-no-properties (point) (line-end-position))))
+            (when (string-match xit--checkbox-regexp line)
+              (let ((item-text (replace-regexp-in-string
+                                 xit--checkbox-regexp ""
+                                 (replace-regexp-in-string xit--priority-regexp "" line)))
+                    (item-point (point))
+                    (tags '())
+                    (start 0))
+                (while (string-match xit--tag-regexp line start)
+                  (let ((tag (downcase (match-string 0 line))))
+                    (unless (member tag tags)
+                      (push tag tags)))
+                  (setq start (match-end 0)))
+                (if tags
+                    (dolist (tag (nreverse tags))
+                      (let ((entry (assoc tag tag-items)))
+                        (if entry
+                            (setcdr entry (cons (cons item-text item-point) (cdr entry)))
+                          (push (cons tag (list (cons item-text item-point))) tag-items))))
+                  (push (cons item-text item-point) untagged)))))
+          (beginning-of-line 2))))
+    (append
+     (mapcar (lambda (entry) (cons (car entry) (nreverse (cdr entry))))
+             (nreverse tag-items))
+     (when untagged
+       (list (cons "(no tag)" (nreverse untagged)))))))
 
 ;; Dates
 
