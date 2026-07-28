@@ -130,15 +130,24 @@ but is otherwise unconstrained.  Only the most common blank characters
 \(space, tab, non-breaking space\) are excluded here, not the full
 Unicode Space Separator category.")
 
+;; Per the spec, dots MUST appear only before or after the exclamation
+;; marks, never on both sides and never interspersed between them (e.g.
+;; "..!" and "!.." are valid, ".!." and "!.!" are not).  A run of dots
+;; with no exclamation marks at all (pure visual padding) is also valid.
+(defvar xit--priority-marker-regexp "\\(?:!+\\.*\\|\\.+!*\\)"
+  "Regexp matching a single valid priority marker (with no separator).")
+
 ;; The spec requires at least one space to separate the checkbox, priority,
 ;; and description, but additional space characters MAY appear too.
-(defvar xit--open-checkbox-regexp "^\\(\\[ \\]\\) +[!.]*\\(.*\\)"
+(defvar xit--open-checkbox-regexp
+  (concat "^\\(\\[ \\]\\) +" xit--priority-marker-regexp "?\\(.*\\)")
   "The regexp used to search for open checkboxes.")
 
 (defvar xit--checked-checkbox-regexp "^\\(\\[x\\]\\) +\\(.*\\)"
   "The regexp used to search for checked checkboxes.")
 
-(defvar xit--ongoing-checkbox-regexp "^\\(\\[@\\]\\) +[!.]*\\(.*\\)"
+(defvar xit--ongoing-checkbox-regexp
+  (concat "^\\(\\[@\\]\\) +" xit--priority-marker-regexp "?\\(.*\\)")
   "The regexp used to search for ongoing checkboxes.")
 
 (defvar xit--obsolete-checkbox-regexp "^\\(\\[~\\]\\) +\\(.*\\)"
@@ -152,10 +161,12 @@ Unicode Space Separator category.")
 Group 1 is the whole checkbox (including its trailing space(s));
 group 2 is just the status character.")
 
-(defvar xit--priority-regexp "\\([!.]+ +\\)"
+(defvar xit--priority-regexp
+  (concat "\\(" xit--priority-marker-regexp " +\\)")
   "The regpexp used to search for the priority.")
 
-(defvar xit--checkbox-priority-regexp "^\\[[x@ ~?]\\] +\\([!.]+\\)[^!.]"
+(defvar xit--checkbox-priority-regexp
+  (concat "^\\[[x@ ~?]\\] +\\(" xit--priority-marker-regexp "\\)[^!.]")
   "The regpexp used to search for the checkbox and the priority.")
 
 (defvar xit--tag-regexp "#[[:alpha:][:digit:]_-]+"
@@ -262,7 +273,16 @@ group 2 is just the status character.")
     (narrow-to-region (line-beginning-position) (line-end-position))
     (goto-char (point-min))
     (if (re-search-forward xit--priority-regexp nil t)
-        (replace-match (concat "!" (match-string-no-properties 1)))
+        ;; Insert the new "!" right after any leading dots (and before any
+        ;; marks), which keeps the dots-before-or-after-but-not-both-sides
+        ;; ordering valid regardless of the marker's existing shape.
+        (let* ((marker (match-string-no-properties 1))
+               (dots-end (save-match-data
+                           (string-match "\\`\\.*" marker)
+                           (match-end 0))))
+          (replace-match (concat (substring marker 0 dots-end)
+                                  "!"
+                                  (substring marker dots-end))))
       (when (re-search-forward xit--checkbox-regexp nil t)
         (replace-match "\\1! ")))))
 
