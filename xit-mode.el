@@ -133,16 +133,19 @@
 (defvar xit--checkbox-priority-regexp "^\\[[x@ ~]\\] \\([!.]+\\)[^!.]"
   "The regpexp used to search for the checkbox and the priority.")
 
-(defvar xit--tag-regexp "#[a-zA-Z0-9]+"
+(defvar xit--tag-regexp "#[[:alpha:][:digit:]_-]+"
   "The regpexp used to search for tags.")
 
-(defvar xit--tag-with-value-regexp "\\(#[a-zA-Z0-9]+\\)=\\([a-zA-Z0-9]+\\)"
+(defvar xit--tag-with-value-regexp
+  "\\(#[[:alpha:][:digit:]_-]+\\)=\\([[:alpha:][:digit:]_-]+\\)"
   "The regpexp used to search for tags with value.")
 
-(defvar xit--tag-with-quoted-value-regexp "\\(#[a-zA-Z0-9]+\\)='\\([^']+\\)'"
+(defvar xit--tag-with-quoted-value-regexp
+  "\\(#[[:alpha:][:digit:]_-]+\\)='\\([^'\n]+\\)'"
   "The regpexp used to search for tags with quoted value.")
 
-(defvar xit--tag-with-double-quoted-value-regexp "\\(#[a-zA-Z0-9]+\\)=\\\"\\([^\\\"]+\\)\\\""
+(defvar xit--tag-with-double-quoted-value-regexp
+  "\\(#[[:alpha:][:digit:]_-]+\\)=\"\\([^\"\n]+\\)\""
   "The regpexp used to search for tags with double quoted value.")
 
 (defvar xit--date-regexp "\\-> [0-9]+\\([-/][QW]*[0-9]+\\)?\\([-/][0-9]+\\)?"
