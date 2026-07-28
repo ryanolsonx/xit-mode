@@ -123,8 +123,12 @@
   "The function used to build the imenu index.
 Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
 
-(defvar xit--group-title-regexp "^[a-zA-Z]+.*$"
-  "The regexp used to search for group titles.")
+(defvar xit--group-title-regexp "^[^ \t\n\u00A0[].*$"
+  "The regexp used to search for group titles.
+Per the spec, a title MUST NOT start with a blank character or `[',
+but is otherwise unconstrained.  Only the most common blank characters
+\(space, tab, non-breaking space\) are excluded here, not the full
+Unicode Space Separator category.")
 
 (defvar xit--open-checkbox-regexp "^\\(\\[ \\]\\) [!.]*\\(.*\\)"
   "The regexp used to search for open checkboxes.")
