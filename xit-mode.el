@@ -84,6 +84,17 @@
   "Face used for obsolete checkbox description."
   :group 'xit-faces)
 
+;; "in question" is the `[?]' checkbox status added in v1.1 of the spec.
+(defface xit-in-question-checkbox-face
+  '((t :inherit warning))
+  "Face used for in question checkbox."
+  :group 'xit-faces)
+
+(defface xit-in-question-description-face
+  '((t :inherit default))
+  "Face used for in question checkbox description."
+  :group 'xit-faces)
+
 (defface xit-priority-face
   '((t :inherit error))
   "Face used for priority markers ! or ."
@@ -127,13 +138,16 @@ Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
 (defvar xit--obsolete-checkbox-regexp "^\\(\\[~\\]\\) \\(.*\\)"
   "The regexp used to search for obsolete checkboxes.")
 
-(defvar xit--checkbox-regexp "^\\(\\[[ x@~]\\] \\)"
+(defvar xit--in-question-checkbox-regexp "^\\(\\[[?]\\]\\) \\(.*\\)"
+  "The regexp used to search for in question checkboxes.")
+
+(defvar xit--checkbox-regexp "^\\(\\[[ x@~?]\\] \\)"
   "The regpexp used to search for the checkbox.")
 
 (defvar xit--priority-regexp "\\([!.]+ \\)"
   "The regpexp used to search for the priority.")
 
-(defvar xit--checkbox-priority-regexp "^\\[[x@ ~]\\] \\([!.]+\\)[^!.]"
+(defvar xit--checkbox-priority-regexp "^\\[[x@ ~?]\\] \\([!.]+\\)[^!.]"
   "The regpexp used to search for the checkbox and the priority.")
 
 (defvar xit--tag-regexp "#[[:alpha:][:digit:]_-]+"
@@ -165,6 +179,9 @@ Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
 
 (defvar xit--checkbox-obsolete-string "[~] "
   "The obsolete checkbox string.")
+
+(defvar xit--checkbox-in-question-string "[?] "
+  "The in question checkbox string.")
 
 ;; Keymap functions
 
@@ -204,6 +221,11 @@ Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
   (interactive)
   (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-obsolete-string))
 
+(defun xit-in-question-item ()
+  "Set an item as in question."
+  (interactive)
+  (xit--item-replace-checkbox xit--checkbox-regexp xit--checkbox-in-question-string))
+
 (defun xit-state-cycle-item ()
   "Cycle through items states."
   (interactive)
@@ -216,6 +238,8 @@ Can be either `xit-imenu-groups' or `xit-imenu-groups-and-items'.")
          ((string-equal checkbox xit--checkbox-open-string)
           (replace-match xit--checkbox-ongoing-string))
          ((string-equal checkbox xit--checkbox-ongoing-string)
+          (replace-match xit--checkbox-in-question-string))
+         ((string-equal checkbox xit--checkbox-in-question-string)
           (replace-match xit--checkbox-checked-string))
          ((string-equal checkbox xit--checkbox-checked-string)
           (replace-match xit--checkbox-obsolete-string))
@@ -333,6 +357,7 @@ section; if the item is already outside of any section, it is left as is."
     (define-key map (kbd "C-c C-d") 'xit-checked-item) ;; d for done
     (define-key map (kbd "C-c C-p") 'xit-ongoing-item) ;; p for progress
     (define-key map (kbd "C-c C-a") 'xit-obsolete-item) ;; a for archive
+    (define-key map (kbd "C-c C-q") 'xit-in-question-item) ;; q for question
     (define-key map (kbd "C-c C-c") 'xit-state-cycle-item) ;; c for cycle
     (define-key map (kbd "C-c C-<up>") 'xit-inc-priority-item)
     (define-key map (kbd "C-c C-<down>") 'xit-dec-priority-item)
@@ -360,6 +385,9 @@ section; if the item is already outside of any section, it is left as is."
    `(,xit--obsolete-checkbox-regexp
      (1 'xit-obsolete-checkbox-face)
      (2 'xit-obsolete-description-face))
+   `(,xit--in-question-checkbox-regexp
+     (1 'xit-in-question-checkbox-face))
+     ;;(2 'xit-in-question-description-face))
    `(,xit--checkbox-priority-regexp 1 'xit-priority-face)
    `(,xit--tag-regexp 0 'xit-tag-face)
    `(,xit--tag-with-value-regexp
