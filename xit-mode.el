@@ -36,6 +36,7 @@
 ;;; Code:
 
 (require 'calendar)
+(require 'cal-iso)
 
 ;; Faces
 
@@ -186,6 +187,19 @@ group 2 is just the status character.")
 
 (defvar xit--date-regexp "\\-> [0-9]+\\([-/][QW]*[0-9]+\\)?\\([-/][0-9]+\\)?"
   "The regpexp used to search for dates.")
+
+(defun xit--date-font-lock-matcher (limit)
+  "Match at most the first due date on each line, up to LIMIT.
+Per the spec, a description MAY contain one due date; any additional
+ones MUST be disregarded, so this only fontifies the first `-> ...'
+found on any given line."
+  (let (found)
+    (while (and (not found) (< (point) limit))
+      (let ((eol (min (line-end-position) limit)))
+        (when (re-search-forward xit--date-regexp eol t)
+          (setq found t))
+        (goto-char (min (1+ (line-end-position)) limit))))
+    found))
 
 (defvar xit--checkbox-open-string "[ ] "
   "The open checkbox string.")
@@ -427,7 +441,7 @@ section; if the item is already outside of any section, it is left as is."
    `(,xit--tag-with-double-quoted-value-regexp
      (1 'xit-tag-face)
      (2 'xit-tag-value-face))
-   `(,xit--date-regexp 0 'xit-date-face))
+   '(xit--date-font-lock-matcher 0 'xit-date-face))
   "Highlighting specification for `xit-mode'.")
 
 ;; Imenu support
@@ -479,10 +493,40 @@ section; if the item is already outside of any section, it is left as is."
 
 ;; Dates
 
-(defun xit-insert-date (date)
-  "Insert DATE at point."
-  (interactive (list (calendar-read-date)))
-  (insert (format "-> %d-%d-%d" (nth 2 date) (nth 1 date) (nth 0 date))))
+(defvar xit--date-kind-alist
+  '(("Calendar day" . day)
+    ("Month" . month)
+    ("Quarter" . quarter)
+    ("Week" . week)
+    ("Year" . year))
+  "Alist of the due date kinds offered by `xit-insert-date'.
+Maps the prompt label to the internal symbol used by `xit--format-date'.")
+
+(defun xit--format-date (date kind)
+  "Format DATE as a due date string of the given KIND.
+DATE is a (MONTH DAY YEAR) list, as returned by `calendar-read-date'.
+KIND is one of `day', `month', `quarter', `week', or `year', matching
+one of the five due date forms defined by the spec."
+  (let ((month (nth 0 date))
+        (day (nth 1 date))
+        (year (nth 2 date)))
+    (cond
+     ((eq kind 'day) (format "-> %04d-%02d-%02d" year month day))
+     ((eq kind 'month) (format "-> %04d-%02d" year month))
+     ((eq kind 'quarter) (format "-> %04d-Q%d" year (1+ (/ (1- month) 3))))
+     ((eq kind 'week)
+      (let ((iso (calendar-iso-from-absolute (calendar-absolute-from-gregorian date))))
+        (format "-> %04d-W%02d" (nth 2 iso) (nth 0 iso))))
+     ((eq kind 'year) (format "-> %04d" year)))))
+
+(defun xit-insert-date (date kind)
+  "Insert a due date of the given KIND, computed from DATE, at point."
+  (interactive
+   (let ((kind (cdr (assoc (completing-read "Due date kind: "
+                                             (mapcar #'car xit--date-kind-alist) nil t)
+                            xit--date-kind-alist))))
+     (list (calendar-read-date) kind)))
+  (insert (xit--format-date date kind)))
 
 ;; Mode definition
 
