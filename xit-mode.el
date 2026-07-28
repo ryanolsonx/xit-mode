@@ -112,25 +112,25 @@
 (defvar xit--group-title-regexp "^[a-zA-Z]+.*$"
   "The regepx used to search for group titles.")
 
-(defvar xit--open-checkbox-regexp "^\\(\\[ \\]\\) [\\!|\\.]*\\(.*\\)"
+(defvar xit--open-checkbox-regexp "^\\(\\[ \\]\\) [!.]*\\(.*\\)"
   "The regepx used to search for open checkboxes.")
 
 (defvar xit--checked-checkbox-regexp "^\\(\\[x\\]\\) \\(.*\\)"
   "The regepx used to search for checked checkboxes.")
 
-(defvar xit--ongoing-checkbox-regexp "^\\(\\[@\\]\\) [\\!|\\.]*\\(.*\\)"
+(defvar xit--ongoing-checkbox-regexp "^\\(\\[@\\]\\) [!.]*\\(.*\\)"
   "The regepx used to search for ongoing checkboxes.")
 
 (defvar xit--obsolete-checkbox-regexp "^\\(\\[~\\]\\) \\(.*\\)"
   "The regepx used to search for obsolete checkboxes.")
 
-(defvar xit--checkbox-regexp "^\\(\\[[ |x|@|~]\\] \\)"
+(defvar xit--checkbox-regexp "^\\(\\[[ x@~]\\] \\)"
   "The regpexp used to search for the checkbox.")
 
-(defvar xit--priority-regexp "\\([\\!|\\.]+ \\)"
+(defvar xit--priority-regexp "\\([!.]+ \\)"
   "The regpexp used to search for the priority.")
 
-(defvar xit--checkbox-priority-regexp "^\\[[x|@| |~]\\] \\([\\!|\\.]+\\)[^\\!|\\.]"
+(defvar xit--checkbox-priority-regexp "^\\[[x@ ~]\\] \\([!.]+\\)[^!.]"
   "The regpexp used to search for the checkbox and the priority.")
 
 (defvar xit--tag-regexp "#[a-zA-Z0-9]+"
@@ -145,7 +145,7 @@
 (defvar xit--tag-with-double-quoted-value-regexp "\\(#[a-zA-Z0-9]+\\)=\\\"\\([^\\\"]+\\)\\\""
   "The regpexp used to search for tags with double quoted value.")
 
-(defvar xit--date-regexp "\\-> [0-9]+\\([-|\\/][Q|W]*[0-9]+\\)?\\([-|\\/][0-9]+\\)?"
+(defvar xit--date-regexp "\\-> [0-9]+\\([-/][QW]*[0-9]+\\)?\\([-/][0-9]+\\)?"
   "The regpexp used to search for dates.")
 
 (defvar xit--checkbox-open-string "[ ] "
