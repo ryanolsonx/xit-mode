@@ -130,28 +130,32 @@ but is otherwise unconstrained.  Only the most common blank characters
 \(space, tab, non-breaking space\) are excluded here, not the full
 Unicode Space Separator category.")
 
-(defvar xit--open-checkbox-regexp "^\\(\\[ \\]\\) [!.]*\\(.*\\)"
+;; The spec requires at least one space to separate the checkbox, priority,
+;; and description, but additional space characters MAY appear too.
+(defvar xit--open-checkbox-regexp "^\\(\\[ \\]\\) +[!.]*\\(.*\\)"
   "The regexp used to search for open checkboxes.")
 
-(defvar xit--checked-checkbox-regexp "^\\(\\[x\\]\\) \\(.*\\)"
+(defvar xit--checked-checkbox-regexp "^\\(\\[x\\]\\) +\\(.*\\)"
   "The regexp used to search for checked checkboxes.")
 
-(defvar xit--ongoing-checkbox-regexp "^\\(\\[@\\]\\) [!.]*\\(.*\\)"
+(defvar xit--ongoing-checkbox-regexp "^\\(\\[@\\]\\) +[!.]*\\(.*\\)"
   "The regexp used to search for ongoing checkboxes.")
 
-(defvar xit--obsolete-checkbox-regexp "^\\(\\[~\\]\\) \\(.*\\)"
+(defvar xit--obsolete-checkbox-regexp "^\\(\\[~\\]\\) +\\(.*\\)"
   "The regexp used to search for obsolete checkboxes.")
 
-(defvar xit--in-question-checkbox-regexp "^\\(\\[[?]\\]\\) \\(.*\\)"
+(defvar xit--in-question-checkbox-regexp "^\\(\\[[?]\\]\\) +\\(.*\\)"
   "The regexp used to search for in question checkboxes.")
 
-(defvar xit--checkbox-regexp "^\\(\\[[ x@~?]\\] \\)"
-  "The regpexp used to search for the checkbox.")
+(defvar xit--checkbox-regexp "^\\(\\[\\([ x@~?]\\)\\] +\\)"
+  "The regpexp used to search for the checkbox.
+Group 1 is the whole checkbox (including its trailing space(s));
+group 2 is just the status character.")
 
-(defvar xit--priority-regexp "\\([!.]+ \\)"
+(defvar xit--priority-regexp "\\([!.]+ +\\)"
   "The regpexp used to search for the priority.")
 
-(defvar xit--checkbox-priority-regexp "^\\[[x@ ~?]\\] \\([!.]+\\)[^!.]"
+(defvar xit--checkbox-priority-regexp "^\\[[x@ ~?]\\] +\\([!.]+\\)[^!.]"
   "The regpexp used to search for the checkbox and the priority.")
 
 (defvar xit--tag-regexp "#[[:alpha:][:digit:]_-]+"
@@ -237,17 +241,17 @@ Unicode Space Separator category.")
     (narrow-to-region (line-beginning-position) (line-end-position))
     (goto-char (point-min))
     (when (re-search-forward xit--checkbox-regexp nil t)
-      (let ((checkbox (match-string-no-properties 0)))
+      (let ((status (match-string-no-properties 2)))
         (cond
-         ((string-equal checkbox xit--checkbox-open-string)
+         ((string-equal status " ")
           (replace-match xit--checkbox-ongoing-string))
-         ((string-equal checkbox xit--checkbox-ongoing-string)
+         ((string-equal status "@")
           (replace-match xit--checkbox-in-question-string))
-         ((string-equal checkbox xit--checkbox-in-question-string)
+         ((string-equal status "?")
           (replace-match xit--checkbox-checked-string))
-         ((string-equal checkbox xit--checkbox-checked-string)
+         ((string-equal status "x")
           (replace-match xit--checkbox-obsolete-string))
-         ((string-equal checkbox xit--checkbox-obsolete-string)
+         ((string-equal status "~")
           (replace-match xit--checkbox-open-string))
          (t (warn "Checkbox not found")))))))
 
@@ -270,7 +274,7 @@ Unicode Space Separator category.")
     (goto-char (point-min))
     (when (re-search-forward xit--priority-regexp nil t)
       (let ((s (substring (match-string-no-properties 1) 1)))
-        (if (string-equal s " ")
+        (if (string-match-p "\\` +\\'" s)
             (replace-match "")
           (replace-match s))))))
 
