@@ -91,3 +91,4 @@ Imenu can be customized via the variable `xit-imenu-function`. Its possible valu
 
 - `'xit-imenu-groups` to list only groups
 - `'xit-imenu-groups-and-items` to list groups and items
+- `'xit-imenu-tags` to list items grouped by tag instead of by group (tags are matched case-insensitively, an item with several tags appears under each of them, and untagged items are collected under a "(no tag)" entry)
